@@ -21,7 +21,6 @@ func (in *TxIn) SameKey(pubKeyHash []byte) bool {
 type TxOut struct {
 	Value      int
 	PubKeyHash []byte
-	spent      bool
 }
 
 // Lock means put a address to TxOut
@@ -39,7 +38,7 @@ func (out *TxOut) IsLockedByKey(pubKeyHash []byte) bool {
 }
 
 func NewTxOut(value int, address string) *TxOut {
-	txo := &TxOut{value, nil, false}
+	txo := &TxOut{value, nil}
 	txo.Lock(address)
 	return txo
 }

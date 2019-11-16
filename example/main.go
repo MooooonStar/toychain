@@ -8,12 +8,12 @@ import (
 )
 
 func main() {
-	// 创世块 T
+	// 创世块 T, 奖励100
 	addr := "17XLQvEM5uKPvuFPqfN8op2GQ6zs51Rqjv"
 	message := "Long Live The Bitcoin"
 	bc := core.NewBlockchain(addr, message)
 
-	// A挖到了第一个块
+	// A挖到了第一个块, 奖励100
 	keyA := core.NewKeyPair()
 	tx0 := core.NewCoinbaseTx(keyA.Address(), "A got it")
 	block1 := core.NewBlock([]*core.Transaction{tx0}, bc.Current.Hash())
@@ -21,7 +21,7 @@ func main() {
 	block1.Nonce = nonce1
 	bc.AddBlock(block1)
 
-	// B挖到了第二个块，并且A向C矿工转账了6
+	// B挖到了第二个块，并且A向C矿工转账了6。 A: 94, B: 100, C: 6
 	keyB, keyC := core.NewKeyPair(), core.NewKeyPair()
 	tx1 := core.NewCoinbaseTx(keyB.Address(), "B got it")
 	tx2, err := core.NewTransaction(keyC.Address(), 6, keyA, bc)
@@ -33,7 +33,7 @@ func main() {
 	block1.Nonce = nonce2
 	bc.AddBlock(block2)
 
-	//D挖到了第三个块, C->D 2, A->T 4
+	// D挖到了第三个块, C->D 2, A->B 4,  A: 90, B: 104, C: 4, D: 102
 	keyD := core.NewKeyPair()
 	tx3 := core.NewCoinbaseTx(keyD.Address(), "D got it")
 	tx4, err := core.NewTransaction(keyD.Address(), 2, keyC, bc)
@@ -49,9 +49,11 @@ func main() {
 	block3.Nonce = nonce3
 	bc.AddBlock(block3)
 
+	// 显示区块的结构
 	bt, _ := prettyjson.Marshal(bc.GetBlocks())
 	log.Println(string(bt))
 
+	// 查看余额是否为 A: 90, B: 104, C: 4, D: 102
 	for _, key := range []*core.KeyPair{keyA, keyB, keyC, keyD} {
 		_, err := core.NewTransaction(addr, 1000, key, bc)
 		if err != nil {

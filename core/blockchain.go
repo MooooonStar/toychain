@@ -22,18 +22,23 @@ func (bc *Blockchain) GetBlocks() []*Block {
 	return bc.blocks
 }
 
+// var DebugMode = false
+
 func (bc *Blockchain) FindUTXO() map[string]map[int]*TxOut {
 	utxo := make(map[string]map[int]*TxOut)
 	for _, block := range bc.blocks {
 		for _, tx := range block.Transactions {
 			for index, vout := range tx.Vout {
-				if utxo[tx.ID.String()] == nil {
-					utxo[tx.ID.String()] = make(map[int]*TxOut)
+				id := tx.ID.String()
+				if utxo[id] == nil {
+					utxo[id] = make(map[int]*TxOut)
 				}
-				utxo[tx.ID.String()][index] = vout
+				utxo[id][index] = vout
 			}
 			for _, vin := range tx.Vin {
-				delete(utxo[vin.TxID.String()], vin.Vout)
+				// FUCK this id, mistake for tx.ID before
+				id := vin.TxID.String()
+				delete(utxo[id], vin.Vout)
 			}
 		}
 	}
@@ -54,14 +59,18 @@ func (bc *Blockchain) FindUTXOForKey(pubKeyHash []byte) []*TxOut {
 	return utxo
 }
 
-func (bc *Blockchain) FindSpendableUTXO(pubKeyHash []byte, amount int) (int, map[string][]*TxOut) {
-	utxo := make(map[string][]*TxOut)
+// should use map in return, because txout has no index info. mistake to use slice before
+func (bc *Blockchain) FindSpendableUTXO(pubKeyHash []byte, amount int) (int, map[string]map[int]*TxOut) {
+	utxo := make(map[string]map[int]*TxOut)
 	accumulated := 0
 	for txid, value := range bc.FindUTXO() {
-		for _, txout := range value {
+		for index, txout := range value {
 			if txout.IsLockedByKey(pubKeyHash) && accumulated < amount {
 				accumulated += txout.Value
-				utxo[txid] = append(utxo[txid], txout)
+				if utxo[txid] == nil {
+					utxo[txid] = make(map[int]*TxOut)
+				}
+				utxo[txid][index] = txout
 			}
 		}
 	}

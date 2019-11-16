@@ -35,7 +35,7 @@ func (tx *Transaction) trimmedCopy() *Transaction {
 	}
 	var outputs []*TxOut
 	for _, vout := range tx.Vout {
-		outputs = append(outputs, &TxOut{vout.Value, vout.PubKeyHash, false})
+		outputs = append(outputs, &TxOut{vout.Value, vout.PubKeyHash})
 	}
 	return &Transaction{tx.ID, inputs, outputs}
 }
