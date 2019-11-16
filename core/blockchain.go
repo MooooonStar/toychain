@@ -104,21 +104,6 @@ func (bc *Blockchain) SignTransaction(tx *Transaction, privKey *ecdsa.PrivateKey
 }
 
 func (bc *Blockchain) String() string {
-	// var buf bytes.Buffer
-	// for _, block := range bc.blocks {
-	// 	for _, tx := range block.Transactions {
-	// 		if tx == nil {
-	// 			continue
-	// 		}
-	// 		for _, vout := range tx.Vout {
-	// 			if vout != nil {
-	// 				str := fmt.Sprintf("to: %x, amount: %v\n", vout.PubKeyHash, vout.Value)
-	// 				buf.WriteString(str)
-	// 			}
-	// 		}
-	// 	}
-	// }
-	// return buf.String()
 	bt, _ := json.Marshal(bc.blocks)
 	return string(bt)
 }

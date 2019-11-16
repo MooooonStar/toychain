@@ -6,13 +6,9 @@ import (
 	"math/big"
 )
 
-const (
-	targetBits = 3
-)
-
 func ProofOfWork(b Block) uint32 {
 	target := big.NewInt(1)
-	target.Lsh(target, uint(256-targetBits))
+	target.Lsh(target, uint(256-b.Target))
 
 	bb := b
 	bb.Nonce = uint32(0)
@@ -36,6 +32,6 @@ func CheckProofOfWork(b Block) bool {
 	hashInt.SetBytes(hash[:])
 
 	target := big.NewInt(1)
-	target.Lsh(target, uint(256-targetBits))
+	target.Lsh(target, uint(256-b.Target))
 	return hashInt.Cmp(target) == -1
 }

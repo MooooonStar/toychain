@@ -252,4 +252,169 @@ ripemd160哈希运算，结果前面加上版本，后面加上校验和，最�
 
 理解里上面这些概念，现在我们就可以做个单机版的玩具链出来啦！
 
+```golang
+package main
+
+import (
+	"log"
+
+	"github.com/MooooonStar/toychain/core"
+	"github.com/hokaccha/go-prettyjson"
+)
+
+func main() {
+  // 创世块
+	addr := "17XLQvEM5uKPvuFPqfN8op2GQ6zs51Rqjv"
+	key := core.NewKeyPair()
+	to, message := key.Address(), "Long Live The Bitcoin"
+	bc := core.NewBlockchain(to, message)
+
+  //交易
+	key1 := core.NewKeyPair()
+	tx1, err := core.NewTransaction(key1.Address(), 6, key, bc)
+	if err != nil {
+		log.Panic(err)
+	}
+
+ //挖矿
+	block1 := core.NewBlock([]*core.Transaction{tx1}, bc.Current.Hash())
+	nonce1 := core.ProofOfWork(*block1)
+	block1.Nonce = nonce1
+	bc.AddBlock(block1)
+
+  //交易和挖矿
+	tx2, err := core.NewTransaction(addr, 2, key1, bc)
+	if err != nil {
+		log.Panic(err)
+	}
+	tx3, err := core.NewTransaction(addr, 3, key, bc)
+	if err != nil {
+		log.Panic(err)
+	}
+	block2 := core.NewBlock([]*core.Transaction{tx2, tx3}, bc.Current.Hash())
+	nonce2 := core.ProofOfWork(*block2)
+	block2.Nonce = nonce2
+	bc.AddBlock(block2)
+
+	bt, _ := prettyjson.Marshal(bc.GetBlocks())
+	log.Println(string(bt))
+}
+```
+
+输出为:
+
+```json
+[
+  {
+    "MerkleRoot": "aae3caa1e04e66cfee2f5101e1d1af6c8064834bf489f504047b17deb6a42943",
+    "Nonce": 0,
+    "PrevBlock": "0000000000000000000000000000000000000000000000000000000000000000",
+    "Target": 16,
+    "Timestamp": 1573872817,
+    "Transactions": [
+      {
+        "ID": "2e0e92f7db707b2557e692d696d6365a0175a31e35fe98a03ee9c4c3354454cd",
+        "Vin": [
+          {
+            "PubKey": "TG9uZyBMaXZlIFRoZSBCaXRjb2lu",          //base64解码后为"Long Live The Bitcoin"，即创世块中留下的信息
+            "Signature": null,
+            "TxID": "0000000000000000000000000000000000000000000000000000000000000000",
+            "Vout": -1                                         // TxID和Vout为0, 创币交易不需要输入
+          }
+        ],
+        "Vout": [
+          {
+            "PubKeyHash": "NdyIkMdzWmRpeL67cvyl9ERKUK8=",      //地址17XLQvEM5uKPvuFPqfN8op2GQ6zs51Rqjv的base58解码，去除前面的版本和后面的校验和
+            "Value": 10
+          }
+        ]
+      }
+    ],
+    "Version": 0
+  },
+  {
+    "MerkleRoot": "5def27d49f27ec653e5589ee49c0712eea9f30e38f446f5a3c47cb227cb7c81c",
+    "Nonce": 6063,                                             // 工作量证明
+    "PrevBlock": "3e29183afd578491d12a3886bed0237854665c801bc6439b10c628f82cd26a76",
+    "Target": 16,                                              // 难度
+    "Timestamp": 1573872817,
+    "Transactions": [
+      {
+        "ID": "0ecbf1a50a78790c1fba6c94df4a372548e509496865bfb4025a71377c5fe92b",
+        "Vin": [
+          {
+            "PubKey": "5vTK/ovpDDnaVx62ft1gGabJDIg9Jc7FY88+LO3N2c3080mVMng3+AkxBzRxNmb9P5NUIpudwpjRMK/XgVUrYw==",
+            "Signature": "jQugfLYTDoCRMN8dKIDeXgaBQjuAfcmFb+1mIOnTT9NTQMhi6Xq21wIL8AajnMytE2fj7pRi1GOPxv8Yc9X/oA==",
+            "TxID": "2e0e92f7db707b2557e692d696d6365a0175a31e35fe98a03ee9c4c3354454cd",      // 引用创世块的交易
+            "Vout": 0                                                                        // 引用交易的第一个输出,10
+          }
+        ],
+        "Vout": [
+          {
+            "PubKeyHash": "BNCnUT7QA81EAEj4ZA6lKpHHhOg=",                                    //向A地址转账6
+            "Value": 6
+          },
+          {
+            "PubKeyHash": "NdyIkMdzWmRpeL67cvyl9ERKUK8=",                                    //给自己找零4
+            "Value": 4
+          }
+        ]
+      }
+    ],
+    "Version": 0
+  },
+  {
+    "MerkleRoot": "59f0a8aa7f027eb80cb664c31b41f496ed310f5b79aaea432d57ead78a72a403",
+    "Nonce": 33056,                                                                           //工作量证明
+    "PrevBlock": "0000e76e73e357e0e88bea1e9cff21804fdc992c5ec4995a6caa2f2ba68cb8dc",
+    "Target": 16,
+    "Timestamp": 1573872817,
+    "Transactions": [
+      {
+        "ID": "541de4b819e748cf24efc7064b45d2feb0da30fa767ab1e5284c85c8c6873c8b",
+        "Vin": [
+          {
+            "PubKey": "5tbRH49GgwyJ7utRSe+ftXgKS8R2je9d6SoKRkQ4rSKJO7wJr1/mt8G4qJzaxXA82MYbIiE68h+pXgyKy0TLnw==",
+            "Signature": "Fg5Xgb+58+f7dduzqj4Zzg03QEDgu4Gtm0wevlDjmvktIIB/UYNX4uL5XrDRPHpK0FAdWPTxwilDCVYBXPROAQ==",
+            "TxID": "0ecbf1a50a78790c1fba6c94df4a372548e509496865bfb4025a71377c5fe92b",
+            "Vout": 0
+          }
+        ],
+        "Vout": [
+          {
+            "PubKeyHash": "R41wLUp70Wr7+Lfm7rlQ8aNEG4A=",
+            "Value": 2
+          },
+          {
+            "PubKeyHash": "BNCnUT7QA81EAEj4ZA6lKpHHhOg=",
+            "Value": 4
+          }
+        ]
+      },
+      {
+        "ID": "ec9d8d25d0a9fd47de7cc31c8859923260f0266374980f42a1429b80ad19eae7",
+        "Vin": [
+          {
+            "PubKey": "5vTK/ovpDDnaVx62ft1gGabJDIg9Jc7FY88+LO3N2c3080mVMng3+AkxBzRxNmb9P5NUIpudwpjRMK/XgVUrYw==",
+            "Signature": "C81Tun//47F7MfDTjAil7odINSh5RV7Mnf1wARiOozxifceufXLCnn72k7uBY8rhOpKH9MeLI1O7JJy4MBQgSg==",
+            "TxID": "0ecbf1a50a78790c1fba6c94df4a372548e509496865bfb4025a71377c5fe92b",
+            "Vout": 0
+          }
+        ],
+        "Vout": [
+          {
+            "PubKeyHash": "R41wLUp70Wr7+Lfm7rlQ8aNEG4A=",
+            "Value": 3
+          },
+          {
+            "PubKeyHash": "NdyIkMdzWmRpeL67cvyl9ERKUK8=",
+            "Value": 1
+          }
+        ]
+      }
+    ],
+    "Version": 0
+  }
+]
+```
 

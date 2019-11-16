@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 )
 
@@ -29,10 +30,19 @@ func HashFromString(hash string) (h Hash, err error) {
 }
 
 func (h Hash) MarshalJSON() ([]byte, error) {
-	return h[:], nil
+	str := hex.EncodeToString(h[:])
+	return json.Marshal(str)
 }
 
 func (h *Hash) UnmarshalJSON(data []byte) error {
-	copy(h[:], data)
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	bt, err := hex.DecodeString(str)
+	if err != nil {
+		return err
+	}
+	copy(h[:], bt[:32])
 	return nil
 }

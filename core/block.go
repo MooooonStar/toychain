@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+const (
+	// set as a contant in target
+	TargetBits = 8
+)
+
 type BlockHeader struct {
 	Version    uint32
 	PrevBlock  Hash
@@ -65,6 +70,7 @@ func NewBlock(transactions []*Transaction, preBlock Hash) *Block {
 	block := &Block{header, transactions}
 	block.Nonce = ProofOfWork(*block)
 	block.MerkleRoot = block.HashTransactions()
+	block.Target = TargetBits
 	return block
 }
 

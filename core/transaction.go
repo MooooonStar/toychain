@@ -111,12 +111,13 @@ func (tx *Transaction) Verify(preTxs map[string]*Transaction) error {
 }
 
 const (
-	subsidy = 10
+	// 挖矿奖励恒定为100
+	Prize = 100
 )
 
 func NewCoinbaseTx(to, data string) *Transaction {
 	txin := &TxIn{Hash{}, -1, nil, []byte(data)}
-	txout := NewTxOut(subsidy, to)
+	txout := NewTxOut(Prize, to)
 	tx := &Transaction{Hash{}, []*TxIn{txin}, []*TxOut{txout}}
 	tx.ID = tx.Hash()
 	return tx
