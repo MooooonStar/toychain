@@ -1,4 +1,4 @@
-module github.com/MooooonStar/minichain
+module github.com/MooooonStar/toychain
 
 go 1.12
 

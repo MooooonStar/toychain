@@ -18,6 +18,10 @@ func NewBlockchain(to, message string) *Blockchain {
 	return &Blockchain{[]*Block{block}, block}
 }
 
+func (bc *Blockchain) GetBlocks() []*Block {
+	return bc.blocks
+}
+
 func (bc *Blockchain) FindUTXO() map[string]map[int]*TxOut {
 	utxo := make(map[string]map[int]*TxOut)
 	for _, block := range bc.blocks {

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 
-	"github.com/MooooonStar/minichain/core"
+	"github.com/MooooonStar/toychain/core"
 )
 
 type Node struct {

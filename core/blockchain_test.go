@@ -13,10 +13,10 @@ func TestUXTO(t *testing.T) {
 
 	key := NewKeyPair()
 	to, message := key.Address(), "Long Live The Bitcoin"
-	bc := NewBlockChain(to, message)
+	bc := NewBlockchain(to, message)
 
 	key1 := NewKeyPair()
-	tx1, err := NewTransaction(key, key1.Address(), 6, bc)
+	tx1, err := NewTransaction(key1.Address(), 6, key, bc)
 	assert.Nil(t, err)
 	block1 := NewBlock([]*Transaction{tx1}, bc.Current.Hash())
 	nonce1 := ProofOfWork(*block1)
@@ -24,9 +24,9 @@ func TestUXTO(t *testing.T) {
 	// assert.True(t, CheckProofOfWork(*block1))
 	bc.AddBlock(block1)
 
-	tx2, err := NewTransaction(key1, addr, 2, bc)
+	tx2, err := NewTransaction(addr, 2, key1, bc)
 	assert.Nil(t, err)
-	tx3, err := NewTransaction(key, addr, 3, bc)
+	tx3, err := NewTransaction(addr, 3, key, bc)
 	assert.Nil(t, err)
 	block2 := NewBlock([]*Transaction{tx2, tx3}, bc.Current.Hash())
 	nonce2 := ProofOfWork(*block2)

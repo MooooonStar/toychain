@@ -27,3 +27,12 @@ func HashFromString(hash string) (h Hash, err error) {
 	copy(h[:], bt)
 	return
 }
+
+func (h Hash) MarshalJSON() ([]byte, error) {
+	return h[:], nil
+}
+
+func (h *Hash) UnmarshalJSON(data []byte) error {
+	copy(h[:], data)
+	return nil
+}
