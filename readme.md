@@ -443,7 +443,7 @@ func main() {
 ```
 
 #### 最后
-1. 代码参考了 ```https://github.com/Jeiwan/blockchain_go```， 如有雷同，算我抄他
+1. 代码参考了[blockchain_go](https://github.com/Jeiwan/blockchain_go)， 如有雷同，算我抄他
 2. 书籍参考了《精通比特币（第二版)》
 3. 打赏: ```17XLQvEM5uKPvuFPqfN8op2GQ6zs51Rqjv```
 4. TODO: 加入P2P网络
